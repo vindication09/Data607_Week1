@@ -1,0 +1,255 @@
+---
+title: "DATA 607 Week 1"
+author: "Vinicio, Haro"
+date: "February 2, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+1) Reading in the data and naming the columns 
+read in the data from the URL
+https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data
+
+Description of the data here: https://archive.ics.uci.edu/ml/datasets/Mushroom
+
+The data does not contain any headers so set header=FALSE
+Details here: https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+```{r setup, include=FALSE}
+
+library(data.table)
+df.mushroom<-fread("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data", header= FALSE, sep=",")
+
+
+```
+
+Check the data 
+
+```{r mushroom}
+head(df.mushroom)
+```
+
+Now we need to use the provided documentation in order to name the columns with the correct names.
+Lets create a vector that has all the column names. We can append this vector to the columns to assign
+column names
+This handy tutorial details the process I used:
+http://rprogramming.net/rename-columns-in-r/
+```{r pressure, echo=FALSE}
+mushroom.col <- c("class", "capshape", "cap_surface","cap-color", "bruises?", "odor", "gill-attachment",
+                    "gill-spacing", "gill-size", "gill-color", "stalk-shape" ,"stalk-root", "stalk-surface-above-ring",
+                    "stalk-surface-below-ring", "stalk-color-above-ring", "stalk-color-below-ring" ,"veil-type",
+                    "veil-color", "ring-number", "ring-type", "spore_print_color", "population", "habitat")
+
+```
+
+Append the column names to the dataframe 
+
+```{r column names}
+colnames(df.mushroom) <- mushroom.col
+```
+
+2) Select the column called class and an addition 3 or 4 columns. We need to create a subset of the data 
+Why did I pick these columns? 
+Lets say I wanted to find a relationship between class and some physical attributes. 
+I could answer the question, can we predict if a mushroom is edible or poisonous by some of its 
+physcal attributes?
+Here we just use very basic commans to make the subset. We are not using any additional critera for more filtering. 
+```{r}
+df.mushroomb<-subset(df.mushroom, select=c('class', 'capshape', 'odor', 'spore_print_color'))
+```
+
+3) We need transform the columns we picked from abbreviated names to full names based on the data documentation.
+Transform the class variable: map P to poisonous and e to edible as given in the documentation.
+
+We can do this manually but a loop to iterate on each entry might be easier.
+Lets convert the other entries in the selected columns to their full names as well. 
+Refer to this link for a handy tutorial I used to write the following loops https://www.datamentor.io/r-programming/if-else-statement
+
+
+```{r class mapping}
+i <- 1
+for (x in df.mushroomb$class)
+{
+  if (x == 'p')
+  	  {
+      df.mushroomb$class[i] <- "poisonous"
+      } 
+  	  else if (x == 'e')
+  	  {
+      df.mushroomb$class[i] <- "edible"
+      }
+  i <- i + 1
+}
+
+
+```
+
+```{r capshape mapping }
+i <- 1
+for (x in df.mushroomb$capshape)
+{
+  if (x == 'b')
+  	   {
+    df.mushroomb$capshape[i] <- "bell"
+       }
+  	else if (x == 'c')
+  	   {
+    df.mushroomb$capshape[i] <- "conical"
+       }
+  	else if (x == 'x')
+  	   {
+    df.mushroomb$capshape[i] <- "convex"
+       }
+  	else if (x == 'f')
+  	   {
+    df.mushroomb$capshape[i] <- "flat"
+       }
+  	else if (x == 'k')
+  	   {
+    df.mushroomb$capshape[i] <- "knobbed"
+       }
+  	else if (x == 's'){
+    df.mushroomb$capshape[i] <- "sunken"
+       }
+  i <- i + 1
+}
+```
+
+
+
+```{r odor mapping}
+i <- 1
+for (x in df.mushroomb$odor)
+{
+  if (x == 'a')
+  	   {
+    df.mushroomb$odor[i] <- "almond"
+       }
+  	else if (x == 'l')
+  	   {
+    df.mushroomb$odor[i] <- "anise"
+       }
+  	else if (x == 'c')
+  	   {
+    df.mushroomb$odor[i] <- "creosote"
+       }
+  	else if (x == 'y')
+  	   {
+    df.mushroomb$odor[i] <- "fishy"
+       }
+  	else if (x == 'f')
+  	   {
+    df.mushroomb$odor[i] <- "foul"
+       }
+  	else if (x == 'm')
+  	   {
+    df.mushroomb$odor[i] <- "musty"
+       }
+       else if (x == 'n')
+  	   {
+    df.mushroomb$odor[i] <- "none"
+       }
+       else if (x == 'p')
+  	   {
+    df.mushroomb$odor[i] <- "pungent"
+       }
+       else if (x == 's')
+  	   {
+    df.mushroomb$odor[i] <- "spicy"
+       }
+  i <- i + 1
+}
+```
+
+```{r spore print color mapping }
+i <- 1
+for (x in df.mushroomb$spore_print_color)
+{
+  if (x == 'k')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "black"
+       }
+  	else if (x == 'n')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "brown"
+       }
+  	else if (x == 'b')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "buff"
+       }
+  	else if (x == 'h')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "chocolate"
+       }
+  	else if (x == 'r')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "green"
+       }
+  	else if (x == 'o')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "orange"
+       }
+       else if (x == 'u')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "purple"
+       }
+       else if (x == 'w')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "white"
+       }
+       else if (x == 'y')
+  	   {
+    df.mushroomb$spore_print_color[i] <- "yellow"
+       }
+  i <- i + 1
+} 
+```
+
+Troubleshooting: You may need to specify factors as false when you load in the data, 
+otherwise the loops will not work. This depends on how the data is loaded in. fread seemed to fix it. 
+How is our data so far? 
+```{r new data frame}
+head(df.mushroomb)
+```
+Data looks good! 
+Looks good, lets explore the data 
+What are the relative frequencies for the class variable?
+Lets try some things to answer this question 
+
+Get the counts of edible or poisonous 
+```{r counts of edible/poisonous mushrooms}
+table(df.mushroomb$class)
+```
+convert counts to proportions instead 
+```{r proportions}
+class_counts <- table(df.mushroomb$class)
+class_counts / sum(class_counts)
+```
+
+
+lets visually summerize the data using a standard barplot 
+We will use ggplot2 and then use summary to see binning and plotting details 
+```{r plot}
+library(ggplot2)
+bar_plt <- ggplot(df.mushroomb, aes(x = class)) 
+bar_plt <- bar_plt + geom_bar()
+summary(bar_plt)
+```
+
+
+```{r, echo=FALSE}
+bar_plt
+```
+
+
+There are many more variations of data exploration but for the task at hand, the data has been subsetted and renamed for downstream analysis. 
+
+One last check:
+```{r}
+head(df.mushroomb)
+```
+
+```{r}
+tail(df.mushroomb)
+```
+
